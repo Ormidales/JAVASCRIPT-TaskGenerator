@@ -1,0 +1,155 @@
+<html>
+  <head>
+    <title>Ma liste de tâches</title>
+    <style>
+      /* Styles CSS pour la mise en forme de la page */
+    </style>
+  </head>
+  <body>
+    <h1>Ma liste de tâches</h1>
+
+    <form>
+      <input type="text" id="task-input" placeholder="Ajouter une tâche">
+      <button type="submit" id="add-task-button">Ajouter</button>
+    </form>
+
+    <ul id="task-list">
+      <!-- Les tâches seront affichées ici -->
+    </ul>
+
+    <script>
+      // Récupération des éléments de la page web
+      const taskInput = document.getElementById('task-input');
+      const addTaskButton = document.getElementById('add-task-button');
+      const taskList = document.getElementById('task-list');
+
+      // Fonction pour charger les tâches depuis le LocalStorage
+      function loadTasks() {
+        // Récupération des tâches enregistrées dans le LocalStorage
+        const tasks = localStorage.getItem('tasks');
+
+        // Si des tâches ont été enregistrées, on les ajoute à la liste
+        if (tasks !== null) {
+          // On convertit la chaîne JSON en un tableau JavaScript
+          const taskArray = JSON.parse(tasks);
+
+          // On parcourt le tableau pour ajouter chaque tâche à la liste
+          for (const task of taskArray) {
+            // Création d'un élément li pour afficher la tâche
+            const li = document.createElement('li');
+            li.innerText = task;
+
+            // Ajout de l'élément li à la liste
+            taskList.appendChild(li);
+          }
+        }
+      }
+
+      // Fonction pour ajouter une tâche à la liste
+      function addTask() {
+        // Récupération de la valeur saisie dans l'input
+        const task = taskInput.value;
+
+        // Vérification que la tâche n'est pas vide
+        if (task === '') {
+          return;
+        }
+
+        // Création d'un élément <li> pour afficher la tâche
+        const li = document.createElement('li');
+        li.innerText = task;
+
+        // Création d'un bouton "Supprimer" pour cette tâche
+        const deleteButton = document.createElement('button');
+        deleteButton.innerText = 'Supprimer';
+        deleteButton.classList.add('delete-button');
+
+        // Ajout d'un écouteur d'événements pour détecter lorsque l'utilisateur clique sur le bouton "Supprimer"
+        deleteButton.addEventListener('click', deleteTask);
+
+        // Ajout du bouton "Supprimer" à l'élément <li>
+        li.appendChild(deleteButton);
+
+        // Ajout de l'élément <li> à la liste
+        taskList.appendChild(li);
+
+        // Récupération des tâches enregistrées dans le LocalStorage
+        const tasks = localStorage.getItem('tasks');
+
+        // Si des tâches ont été enregistrées, on les ajoute à la liste
+        if (tasks !== null) {
+          // On convertit la chaîne JSON en un tableau JavaScript
+          const taskArray = JSON.parse(tasks);
+
+          // On ajoute la nouvelle tâche au tableau
+          taskArray.push(task);
+
+          // On convertit le tableau en chaîne JSON
+          const taskString = JSON.stringify(taskArray);
+
+          // On enregistre la chaîne JSON dans le LocalStorage
+          localStorage.setItem('tasks', taskString);
+        } else {
+          // Si aucune tâche n'a été enregistrée, on crée un tableau avec la nouvelle tâche
+          const taskArray = [task];
+
+          // On convertit le tableau en chaîne JSON
+          const taskString = JSON.stringify(taskArray);
+
+          // On enregistre la chaîne JSON dans le LocalStorage
+          localStorage.setItem('tasks', taskString);
+        }
+
+        // Réinitialisation de la valeur de l'input
+        taskInput.value = '';
+      }
+
+      // Supprimer une tâche
+      function deleteTask(event) {
+        // Récupération de l'élément <li> qui contient la tâche à supprimer
+        const li = event.target.parentElement;
+
+        // Suppression de l'élément <li> de la liste
+        taskList.removeChild(li);
+
+        // Récupération des tâches enregistrées dans le LocalStorage
+        const tasks = localStorage.getItem('tasks');
+
+        // Si des tâches ont été enregistrées, on les ajoute à la liste
+        if (tasks !== null) {
+          // On convertit la chaîne JSON en un tableau JavaScript
+          const taskArray = JSON.parse(tasks);
+
+          // On récupère l'index de la tâche à supprimer
+          const taskIndex = taskArray.indexOf(li.innerText);
+
+          // On supprime la tâche du tableau
+          taskArray.splice(taskIndex, 1);
+
+          // On convertit le tableau en chaîne JSON
+          const taskString = JSON.stringify(taskArray);
+
+          // On enregistre la chaîne JSON dans le LocalStorage
+          localStorage.setItem('tasks', taskString);
+        }
+      }
+
+      // Quand la page est chargée, on appelle la fonction pour charger les tâches enregistrées
+      window.addEventListener('load', loadTasks);
+
+      // Ajout d'un écouteur d'événement "submit" sur le formulaire
+      addTaskButton.addEventListener('click', function (event) {
+        event.preventDefault(); // Empêche la soumission du formulaire
+        addTask(); // Appel de la fonction pour ajouter une tâche
+      });
+
+      // Quand la page est chargée, on ajoute un écouteur d'événement "click" sur chaque bouton "Supprimer"
+      window.addEventListener('load', function() {
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        for (const button of deleteButtons) {
+          button.addEventListener('click', deleteTask);
+        }
+      });
+    </script>
+  </body>
+</html>
